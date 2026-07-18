@@ -1,0 +1,141 @@
+<div class="page-shell">
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Voz em Texto — início">
+      <span class="brand-mark" aria-hidden="true"><i></i></span>
+      <span>Voz em Texto</span>
+    </a>
+    <span class="local-badge"><i></i> Sem API paga</span>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">MVP DE TRANSCRIÇÃO</p>
+        <h1>Fale. Envie.<br /><em>Confira.</em></h1>
+        <p class="intro">
+          Grave uma mensagem curta em português e transforme sua voz em texto.
+          Simples, rápido e processado no próprio servidor.
+        </p>
+        <div class="privacy-note">
+          <span class="shield" aria-hidden="true">✓</span>
+          <p><strong>Seu áudio não fica guardado.</strong><br />Somente o texto entra no histórico.</p>
+        </div>
+      </div>
+
+      <section class="recorder-card" aria-labelledby="recorder-title">
+        <div class="card-heading">
+          <div>
+            <p class="section-label">NOVA GRAVAÇÃO</p>
+            <h2 id="recorder-title">
+              @if (state() === 'recording') { Estou ouvindo... }
+              @else if (state() === 'ready') { Pronto para enviar }
+              @else if (state() === 'uploading') { Transcrevendo... }
+              @else { Toque para gravar }
+            </h2>
+          </div>
+          <span class="limit">máx. 15s</span>
+        </div>
+
+        <div class="timer" [class.active]="state() === 'recording'">{{ timerLabel() }}</div>
+        <div
+          class="progress-track"
+          role="progressbar"
+          aria-label="Tempo da gravação"
+          aria-valuemin="0"
+          aria-valuemax="15"
+          [attr.aria-valuenow]="elapsedMs() / 1000"
+        >
+          <span [style.width.%]="progress()"></span>
+        </div>
+
+        <div class="sound-wave" [class.listening]="state() === 'recording'" aria-hidden="true">
+          @for (bar of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]; track bar) {
+            <i [style.--bar]="bar"></i>
+          }
+        </div>
+
+        @if (state() === 'idle') {
+          <button class="record-button" type="button" (click)="startRecording()">
+            <span class="mic-icon" aria-hidden="true"><i></i></span>
+            Gravar áudio
+          </button>
+        }
+
+        @if (state() === 'recording') {
+          <div class="action-row">
+            <button class="secondary-button" type="button" (click)="cancelRecording()">Cancelar</button>
+            <button class="stop-button" type="button" (click)="stopRecording()">
+              <span aria-hidden="true"></span> Parar
+            </button>
+          </div>
+        }
+
+        @if (state() === 'ready' && audioUrl()) {
+          <audio class="audio-preview" [src]="audioUrl()" controls aria-label="Prévia da gravação"></audio>
+          <div class="action-row">
+            <button class="secondary-button" type="button" (click)="cancelRecording()">Descartar</button>
+            <button class="send-button" type="button" (click)="sendRecording()">Enviar e transcrever</button>
+          </div>
+        }
+
+        @if (state() === 'uploading') {
+          <div class="processing" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            O primeiro envio pode demorar enquanto o modelo é preparado.
+          </div>
+        }
+
+        @if (error()) {
+          <p class="error-message" role="alert">{{ error() }}</p>
+        }
+      </section>
+    </section>
+
+    @if (latest(); as item) {
+      <section class="latest-card" aria-live="polite">
+        <div class="success-mark" aria-hidden="true">✓</div>
+        <div>
+          <p>TRANSCRIÇÃO CONCLUÍDA</p>
+          <blockquote>“{{ item.text }}”</blockquote>
+          <span>{{ formatSeconds(item.durationMs) }} de áudio · processado em {{ formatProcessing(item.processingMs) }}</span>
+        </div>
+      </section>
+    }
+
+    <section class="history-section" aria-labelledby="history-title">
+      <div class="history-heading">
+        <div>
+          <p class="section-label">REGISTROS RECENTES</p>
+          <h2 id="history-title">Últimas transcrições</h2>
+        </div>
+        <span>até 10 registros</span>
+      </div>
+
+      @if (loadingHistory()) {
+        <div class="empty-state">Carregando histórico...</div>
+      } @else if (history().length === 0) {
+        <div class="empty-state">
+          <span aria-hidden="true">01</span>
+          <p><strong>Nenhuma transcrição ainda.</strong><br />Sua primeira gravação aparecerá aqui.</p>
+        </div>
+      } @else {
+        <ol class="history-list">
+          @for (item of history(); track item.id; let index = $index) {
+            <li>
+              <span class="history-number">{{ (index + 1).toString().padStart(2, '0') }}</span>
+              <p>{{ item.text }}</p>
+              <time [attr.datetime]="item.createdAtUtc">
+                {{ item.createdAtUtc | date: 'dd/MM, HH:mm' }} · {{ formatSeconds(item.durationMs) }}
+              </time>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+  </main>
+
+  <footer>
+    <span>Whisper.net + Angular + ASP.NET Core</span>
+    <span>Áudios temporários são apagados após o processamento.</span>
+  </footer>
+</div>

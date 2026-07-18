@@ -1,0 +1,29 @@
+# .NET
+**/bin/
+**/obj/
+**/TestResults/
+
+# Angular / Node
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Runtime data
+api/storage/
+api/whisper/
+api/wwwroot/
+*.db
+*.db-shm
+*.db-wal
+*.download
+
+# Editors and operating systems
+.idea/
+.vs/
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+!.env.example

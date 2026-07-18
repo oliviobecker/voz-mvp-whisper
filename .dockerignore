@@ -1,0 +1,11 @@
+.git
+.github
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.angular
+api/storage
+api/whisper
+api/wwwroot
+*.db

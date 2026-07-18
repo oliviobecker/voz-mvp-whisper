@@ -1,0 +1,13 @@
+services:
+  voz-mvp:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - voice-data:/app/storage
+      - whisper-models:/app/models
+    restart: unless-stopped
+
+volumes:
+  voice-data:
+  whisper-models:
