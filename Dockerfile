@@ -12,7 +12,7 @@ RUN dotnet restore api/VoiceMvp.Api.csproj
 COPY api/ api/
 RUN dotnet publish api/VoiceMvp.Api.csproj -c Release -o /app/publish --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-bookworm-slim AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg curl \
     && rm -rf /var/lib/apt/lists/*
